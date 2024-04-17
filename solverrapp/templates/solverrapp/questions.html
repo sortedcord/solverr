@@ -1,0 +1,30 @@
+{% extends 'solverrapp/base.html' %}
+
+{% block content %}
+
+{% for question in questions %}
+<div class="card mb-3">
+    {% if not question.display_image is None %}
+    <!-- QUESTION TYPE: EMBEDDED IMAGE -->
+    <div class="row g-0">
+      <div class="col-md-8">
+        <div class="card-body">
+          <h6 class="card-subtitle">{{question.display_text}}</h5>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <img class="img-fluid rounded-end" style="max-height: 150px;" src="{{question.display_image}}" />
+      </div>
+    </div>
+
+    {% elif question.display_image is None %}
+    <!-- QUESTION TYPE: PLAIN TEXT -->
+    <div class="card-body">
+        <h6 class="card-subtitle">{{question.display_text}}</h5>
+      </div>
+    {% endif %}
+
+  </div>
+{% endfor %}
+{% endblock %}
