@@ -46,6 +46,7 @@ class Question(models.Model):
         img_md_pattern = r"!\[(.*?)\]\((.*?)\)"
 
         self.display_body = re.sub(img_md_pattern, lambda match: f'<img src="{match.group(2)}" style="max-height:250px;" alt="{match.group(1)}">', self.question_body)
+        self.display_body = re.sub(r'\n', '<br>', self.display_body)
 
         pattern = r'<img\s+[^>]*src="([^"]*)"[^>]*>'
         img_tags = re.findall(pattern, self.display_body)
@@ -55,7 +56,7 @@ class Question(models.Model):
         self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip() + "..."
     
     def __str__(self) -> str:
-        return self.search_text[:50]+' ...'
+        return self.question_body[:50]+' ...'
     
     def save(self) -> None:
         self.render_body()
