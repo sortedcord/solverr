@@ -5,7 +5,7 @@
 <form>
     <div class="mb-3">
         <label class="form-label">Question Type</label>
-        <select class="form-select mb-1" id="question-type-select" aria-label="Question Type Select"
+        <select  class="form-select mb-1" id="question-type-select" aria-label="Question Type Select"
             onchange="update_question_type()">
             {% for key, value in question_types %}
             <option value="{{key}}">{{ value }}</option>
@@ -81,9 +81,7 @@
                 </div>
             </div>
             <textarea rows="5" type="text" oninput="renderQuestion()" class="form-control" style="border-radius: 0;"
-                id="question_body" required>
-                If 23 ohms of resistance is added to 12 oscillation terminator at the ends of a broken wire such that a $\times$ b is working properly.
-            </textarea>
+                id="question_body" required></textarea>
         </div>
         <div class="col-md-5">
             <label class="form-label mb-4">Preview Question</label>
@@ -131,7 +129,7 @@
         <h5>Metadata</h5>
         <label class="form-label">Sources</label>
         <input class="form-control mb-3" placeholder="Search Sources" type="text">
-        <select class="form-select mb-1" size="5" aria-label="source select" multiple>
+        <select id="source-select" class="form-select mb-1" size="5" aria-label="source select" multiple>
             {%for source in sources%}
             <option class="source-option" value="{{source.name}}">{{source.name}}</option>
             {% endfor %}
@@ -493,11 +491,21 @@
             }
         }
 
+        // Process Sources
+        var selected_sources = document.getElementById('source-select').selectedOptions;
+        var sel_sources_final = [];
+        for (i = 0; i<selected_sources.length; i++) {
+            sel_sources_final.push(selected_sources[i].innerText);
+        }
+
+
+
         var question = {
             type: question_type,
             body: question_body,
             options: _options,
             answer: question_answer,
+            sources: sel_sources_final
         }
 
         fetch('/api/new/question', {
@@ -516,7 +524,7 @@
             .then(data => {
                 console.log('POST request succeeded with JSON response', data);
                 new_q_id = data.index;
-                window.location.replace("/questions/"+new_q_id);
+                // window.location.replace("/questions/"+new_q_id);
             })
             .catch(error => {
                 console.error('There was a problem with the POST request:', error);

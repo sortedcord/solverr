@@ -48,6 +48,11 @@ def api_submit_question(request):
             question_options=str(post_data_dict['options']),
         )
         qmodobj.save()
+        sources = post_data_dict['sources']
+        for source_str in sources:
+            source = Source.objects.get(name=source_str)
+            source.question_set.add(qmodobj)
+        qmodobj.save()
 
         return JsonResponse({'payload': post_data_dict, 'index': qmodobj.id})
     else:

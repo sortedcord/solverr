@@ -1,14 +1,14 @@
 {% extends 'solverrapp/base.html' %}
 
 {% block content %}
-
+<button type="button" class="btn btn-primary mb-2" onclick="setTimeout(function(){document.location.href = '/new/'},500);">New</button>
 {% for question in questions %}
 <div class="card mb-3">
     {% if not question.display_image is None %}
     <!-- QUESTION TYPE: EMBEDDED IMAGE -->
     <div class="row g-0">
       <div class="col-md-8">
-        <div class="card-body">
+        <div class="card-body" onclick="setTimeout(function(){document.location.href = '{{question.id}}'},500);">
           <h6 class="card-subtitle">{{question.display_text}}</h5>
         </div>
       </div>
@@ -20,7 +20,7 @@
 
     {% elif question.display_image is None %}
     <!-- QUESTION TYPE: PLAIN TEXT -->
-    <div class="card-body">
+    <div class="card-body" onclick="setTimeout(function(){document.location.href = '{{question.id}}'},500);">
         <h6 class="card-subtitle">{{question.display_text}}</h5>
       </div>
     {% endif %}
