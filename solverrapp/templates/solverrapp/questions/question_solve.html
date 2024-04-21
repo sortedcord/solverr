@@ -1,0 +1,137 @@
+{% extends 'solverrapp/questions/question_detail.html' %}
+
+{% block new_solution %}
+<h3 class="mb-5">New Solution</h3>
+
+<form>
+    <div class="row mb-3">
+        <label for="solution-type" class="col-sm-2 col-form-label">Type</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="solution-type">
+                {% for key, value in solution_types %}
+                <option value="{{key}}">{{value}}</option>
+                {% endfor %}
+            </select>
+            <small class="text-secondary">
+                • Rich-Text: Combination of Images & Text<br>
+            </small>
+        </div>
+    </div>
+
+    <!-- Option Selection [XCQ only] -->
+    <div class="row mb-3">
+        <label for="select-option" class="col-sm-2 col-form-label">Answer</label>
+        <div class="col-sm-10">
+            {% for option in options %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input change-option" type="{%if question.question_type == 'SCQ'%}radio{% else %}checkbox{% endif %}" name="inlineRadioOptions" id="change-option-{{forloop.counter0}}"
+                    value="{{forloop.counter0}}" {% if option.is_correct%}checked{% endif %}>
+                <label class="form-check-label" for="change-option-{{forloop.counter0}}">Option {{forloop.counter}}</label>
+            </div>
+            {% endfor %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input change-option" type="radio" name="inlineRadioOptions" id="change-option-nota"
+                    value="-1">
+                <label class="form-check-label" for="change-option-nota">None</label>
+            </div>
+            </select>
+        </div>
+    </div>
+
+    <!-- For Media-Only Solution -->
+    <div class="row mb-3" id="media-container">
+        <label for="media-source-input" class="col-sm-2 col-form-label">Media URL</label>
+        <div class="col-sm-10">
+            <input type="url" class="form-control" id="media-source-input">
+        </div>
+    </div>
+
+    <!-- RTXT Editor -->
+    <div class="row mb-3" id="editor-container">
+        <label for="question_body" class="col-sm-2 col-form-label">Solution</label>
+        <div class="col-sm-10 rtxt">
+            <div class="btn-toolbar mb-1 rtxt-toolbar" role="toolbar"></div>
+            <textarea rows="5" type="text" class="form-control rounded-3 rtxt-textarea" oninput="renderQuestion();" id="solution-body"></textarea>
+            </div>
+    </div>
+
+    <!-- Preview Solution -->
+    <div class="row mb-3">
+        <label class="col-sm-2 col-form-label">Preview</label>
+        <div class="col-sm-10" id="preview"></div>
+    </div>
+
+    <fieldset class="row mb-3">
+        <legend class="col-form-label col-sm-2 pt-0">Radios</legend>
+        <div class="col-sm-10">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
+                <label class="form-check-label" for="gridRadios1">
+                    First radio
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+                <label class="form-check-label" for="gridRadios2">
+                    Second radio
+                </label>
+            </div>
+            <div class="form-check disabled">
+                <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option3"
+                    disabled>
+                <label class="form-check-label" for="gridRadios3">
+                    Third disabled radio
+                </label>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row mb-3">
+        <div class="col-sm-10 offset-sm-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="gridCheck1">
+                <label class="form-check-label" for="gridCheck1">
+                    Example checkbox
+                </label>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Sign in</button>
+</form>
+
+<script>
+    function renderQuestion() {
+        var text = document.getElementById('solution-body').value;
+        const imgMdPattern = /!\[(.*?)\]\((.*?)\)/g;
+
+        var newText = text.replace(imgMdPattern, (match, altText, src) => {
+            return `<img src="${src}" style="max-height:250px;" alt="${altText}">`;
+        });
+        var newText = newText.replace(/\n/g, "<br>");
+
+        preview_p = document.getElementById('preview');
+        preview_p.innerHTML = newText;
+
+        renderMathInElement(
+            preview_p,
+            {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                ]
+            }
+        );
+    }
+
+    // Make the colors of option change if solution answer is not the same as question's declared answer
+    function processAnswerChange() {
+
+        const question_type = '{{question.question_type}}';
+        // For choice questions
+        if (question_type == 'SCQ' || question_type == 'MCQ') {
+
+        }
+
+        // For value questions
+    }
+</script>
+{% endblock %}

@@ -32,6 +32,13 @@ class Question(models.Model):
     question_body = models.TextField(max_length=3000)
     question_type = models.CharField(choices=QUESTION_TYPES, default="SCQ", max_length=100)
     question_options = models.TextField(max_length=3000, null=True, blank=True)
+    """
+    Schema For Options
+    --- option_index
+    --- option_body
+    --- is_correct
+    """
+
 
     # Metadata
     sources = models.ManyToManyField(Source, null=True, blank=True)
@@ -64,7 +71,13 @@ class Question(models.Model):
 
 
 class Solution(models.Model):
-    solution_type = models.CharField(max_length=100)
+    SOLUTION_TYPES = {
+        "IMG": "Image Only Solution",
+        "VID": "Video Only Solution",
+        "TXT": "Rich-Text Based Solution",
+    }
+
+    solution_type = models.CharField(max_length=100, choices=SOLUTION_TYPES)
     solution_media_source = models.URLField(blank=True, null=True)
 
     solution_body = models.TextField(max_length=3000, blank=True, null=True)
