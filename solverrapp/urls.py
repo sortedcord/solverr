@@ -11,4 +11,5 @@ urlpatterns = [
 
     # API
     path("api/new/question", views.api_question_submit, name="api_question_submit"),
+    path("api/search/question", views.api_question_search, name="api_question_search"),
 ]

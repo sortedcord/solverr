@@ -17,9 +17,15 @@
     <link href="https://getbootstrap.com/docs/5.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+
     <!-- Favicons -->
     <link rel="icon" href="https://i.imgur.com/g5tuULi.png" sizes="32x32" type="image/png">
     <link rel="manifest" href="https://getbootstrap.com/docs/5.3/assets/img/favicons/manifest.json">
+
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <meta name="theme-color" content="#712cf9">
 
@@ -146,12 +152,25 @@
 
         <main class="px-3">
             <!-- <h1>Search Engine for Solutions.</h1> -->
-            <p class="lead">Your comprehensive homework solution aggregator, scouring multiple sources for the perfect answer.</p>
-            <p class="lead">
-                <input type="text" />
-                <button>Search</button>
-            </p>
+            <p class="lead" id="lead">Your comprehensive homework solution aggregator, scouring multiple sources for the perfect answer.</p>
+            <div class="lead">
+                <input type="text" id="query" class="form-control" placeholder="Start typing your question..." oninput="search();" />
+                <div style="display: none;" class="bg-secondary border rounded-2 mt-1" id="symbol-insert">
+                    <span style="font-family: monospace;" class="fs-6">Inserting Symbol</span>
+                    <span style="font-family: monospace;" class="fs-6" id="sym"></span>
+                </div>
+            </div>
         </main>
+         <div class="my-3" id="search-results" style="display: none;">
+                <div class="card" >
+  <ul class="list-group list-group-flush" id="result-list">
+
+  </ul>
+  <div class="card-footer" >
+    View All Results
+  </div>
+</div>
+            </div>
 
         <footer class="mt-auto text-white-50">
             <p>View on Github</p>
@@ -160,7 +179,88 @@
     <script src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<script>
+    var result_list = document.getElementById('result-list');
+    var result_div = document.getElementById('search-results');
 
+    const sym_translate = {
+        'alpha':'α',
+        'belong':'∈',
+        'in':'∈',
+        'beta':'β',
+        'infinity': '∞',
+        'deg':'°',
+        'notequal':'≠',
+        'greaterthanequal':'≥',
+        'lessthanequal':'≤',
+        'gamma':'γ',
+        'delta':'Δ',
+        'epsilon':'ε',
+        'theta':'θ',
+        'lambda':'λ',
+        'mu':'μ',
+        'pi':'π',
+        'SIGMA':'Σ',
+        'sigma':'σ',
+        'OMEGA':'Ω',
+        'omega':'ω',
+    }
+
+    function update_result(json) {
+         var inner_HT = ""
+         for (let i in json.payload.data) {
+             inner_HT += `<li class="list-group-item">${json.payload.data[i].text}</li>`
+        }
+    result_list.innerHTML = inner_HT;
+
+         renderMathInElement(
+            result_list,
+            {
+                delimiters: [
+                    { left: "$", right: "$", display: false },
+                    { left: "$$", right: "$$", display: true },
+                ]
+            }
+        );
+    }
+
+    function search() {
+        var query = document.getElementById('query');
+
+        var sym_insert = document.getElementById("symbol-insert");
+        if (query.value.includes('\\')) {
+            sym_insert.style.display = "block";
+
+
+        } else {
+            sym_insert.style.display = "none";
+        }
+
+
+        for (i in sym_translate) {
+            query.value = query.value.replace("\\"+i, sym_translate[i])
+        }
+
+        query = query.value.trim().replace(/ /g, '%20');
+        if (query === '') {
+            result_list.innerHTML="";
+            result_div.style.display = "none";
+            return;
+        }
+        else {
+            result_div.style.display = 'Block';
+        }
+
+    {#  API CALLS AND STUFF  #}
+        console.log(`api/search/question?q=${query}`)
+    fetch(`api/search/question?q=${query}`)
+    .then((response) => response.json())
+  .then((json) => update_result(json));
+
+
+
+    }
+</script>
 </body>
 
 </html>

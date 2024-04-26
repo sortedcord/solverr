@@ -1,4 +1,6 @@
 import json
+import re
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from .models import Question, Solution, Source
@@ -17,7 +19,30 @@ def questions(request):
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     options = eval(question.question_options)
-    return render(request, "solverrapp/questions/question_detail.html", context={'question':question, 'options':options})
+    try:
+        solutions = Solution.objects.get(question=question)
+    except:
+        solutions = []
+    if not isinstance(solutions, list):
+        solutions = [solutions]
+
+    _solutions = []
+
+    for solution in solutions:
+        if solution.solution_type == 'VID' and solution.solution_media_url.startswith('https://vimeo.com'):
+            video_id = solution.solution_media_url.split("/")[-1].split('?')[0]
+            body = f"""
+<div style="padding:56.25% 0 0 0;position:relative;">
+    <iframe src="https://player.vimeo.com/video/{video_id}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:0.6rem;" title="11"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+            """
+        elif solution.solution_type == 'IMG':
+            body = f"<img src='{ solution.solution_media_url }'>"
+        _solutions.append({
+            'body': body,
+            'solution_source':solution.solution_source
+        })
+
+    return render(request, "solverrapp/questions/question_detail.html", context={'question':question, 'options':options, 'solutions':_solutions})
 
 def question_new(request):
     question_types = Question.QUESTION_TYPES.items()
@@ -38,6 +63,33 @@ def question_solve(request, question_id):
 
 
 # API
+def api_question_search(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Only GET requests are allowed'}, status=405)
+    query = request.GET.get('q').replace("%20", " ").lower()
+    _questions = []
+    q_objs = Question.objects.all()
+    contains = False
+    for question in q_objs:
+        # Check with search_text
+        if question.search_text is not None:
+            #     sanitize query
+            s_query = re.sub(r'[ ,_^:{}()\[\]/]', '', query)
+            if s_query in question.search_text:
+                contains = True
+        if query in question.display_text:
+            contains = True
+        if contains:
+            _questions.append({
+                'text': question.display_text,
+                'image': question.display_image,
+            })
+
+    return JsonResponse({
+        'payload':{'data':_questions[:4]}
+    })
+
+
 @csrf_exempt
 def api_question_submit(request):
     if request.method == 'POST':

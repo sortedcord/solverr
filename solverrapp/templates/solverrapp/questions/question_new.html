@@ -260,7 +260,7 @@
 
     function SubmitQuestion() {
         var question_type = document.getElementById('question-type-select').value;
-        var question_body = document.getElementById('question_body').value;
+        var question_body = document.getElementById('question-body').value;
         var _options = [];
 
 
@@ -367,7 +367,7 @@
             .then(data => {
                 console.log('POST request succeeded with JSON response', data);
                 new_q_id = data.index;
-                // window.location.replace("/questions/"+new_q_id);
+                window.location.replace("/questions/"+new_q_id);
             })
             .catch(error => {
                 console.error('There was a problem with the POST request:', error);

@@ -60,8 +60,8 @@ class Question(models.Model):
         self.display_image = img_tags[0] if img_tags else None
 
         main_string_without_images = re.sub(pattern, '', self.display_body)
-        self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip() + "..."
-    
+        self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip()
+
     def __str__(self) -> str:
         return self.question_body[:50]+' ...'
     
@@ -78,7 +78,8 @@ class Solution(models.Model):
     }
 
     solution_type = models.CharField(max_length=100, choices=SOLUTION_TYPES)
-    solution_media_source = models.URLField(blank=True, null=True)
+    solution_media_url = models.URLField(blank=True, null=True)
+    solution_source = models.CharField(max_length=100, blank=True, null=True)
 
     solution_body = models.TextField(max_length=3000, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)

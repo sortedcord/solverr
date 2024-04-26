@@ -130,7 +130,7 @@ function toolbarInsert(name) {
     
     const equation_mode = isInsideEquation(textarea.value, textarea.selectionStart);
 
-    if (button.cursor == 'end') {
+    if (button.cursor === 'end') {
         start_pos = end_pos = button.code.length;
     } else {
         [start_pos, end_pos] = button.cursor;
@@ -144,7 +144,7 @@ function toolbarInsert(name) {
     start_pos += pre_text.length;
     end_pos += pre_text.length;
     
-    if (group == 'image' || group == 'equation') {
+    if (group === 'image' || group === 'equation') {
         if (equation_mode) {
             console.log("Cannot insert this while enclosed in a latex equation!");
             textarea.focus();

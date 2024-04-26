@@ -9,7 +9,7 @@
         <!-- Options Grid -->
         <div class="row g-3 my-3">
             {% for option in options %}
-            <div class="border border-1 rounded-2 p-3 col-md-5 mx-2 {% if option.is_correct%}border-success{%endif%}">
+            <div class="border border-1 rounded-2 p-3 col-12 mx-2 {% if option.is_correct%}border-success{%endif%}">
                 {{option.option_body|safe}}</div>
             {% endfor %}
         </div>
@@ -19,14 +19,13 @@
     <div class="col-md-6">
         {% if 'solve' not in request.path %}
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        {% for solution in solutions %}
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
-                    type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
+                <button class="nav-link active" id="pills-{{ solution.solution_source }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ solution.solution_source }}"
+                    type="button" role="tab" aria-controls="pills-{{ solution.solution_source }}" aria-selected="true">{{ solution.solution_source }}</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile"
-                    type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</button>
-            </li>
+        {% endfor %}
+
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact"
                     type="button" role="tab" aria-controls="pills-contact" aria-selected="false">About the
@@ -34,11 +33,12 @@
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab"
-                tabindex="0">1tb</div>
-            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab"
-                tabindex="0">2tb
+        {% for solution in solutions %}
+            <div class="tab-pane fade show active" id="pills-{{ solution.solution_source }}" role="tabpanel" aria-labelledby="pills-{{ solution.solution_source }}-tab"
+                tabindex="0">
+            {{ solution.body|safe }}
             </div>
+        {% endfor %}
             <!-- About the question -->
             <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab"
                 tabindex="0">
@@ -50,7 +50,7 @@
         </div>
 
         <!-- New Solution -->
-        <button type="button" class="btn btn-outline-primary"
+        <button type="button" class="btn btn-outline-primary my-3"
             onclick="setTimeout(function(){document.location.href = 'solve'},200);">Submit New Solution</button>
         {% endif %}
         <!-- New Solution Block -->
