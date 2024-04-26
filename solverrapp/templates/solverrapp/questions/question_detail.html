@@ -7,13 +7,18 @@
         <div class="display: inline-block;">{{question.display_body|safe}}</div>
 
         <!-- Options Grid -->
-        <div class="row g-3 my-3">
+        <div class="row g-3 my-3 px-2">
             {% for option in options %}
-            <div class="border border-1 rounded-2 p-3 col-12 mx-2 {% if option.is_correct%}border-success{%endif%}">
+            <div class="border border-1 rounded-2 p-3 col-12 {% if option.is_correct%}border-success{%endif%}">
                 {{option.option_body|safe}}</div>
             {% endfor %}
         </div>
+    {% for topic in question.topics.all %}
+        <span class="badge text-bg-secondary">{{ topic.name }}</span>
+    {% endfor %}
+        <button class="btn btn-outline-success"><a style="text-decoration: none;" href="/admin/solverrapp/question/{{ question.id }}/change/">Edit Question</a></button>
     </div>
+
 
     <!-- TABS -->
     <div class="col-md-6">
@@ -21,7 +26,7 @@
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         {% for solution in solutions %}
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-{{ solution.solution_source }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ solution.solution_source }}"
+                <button class="me-2 nav-link {% if forloop.counter0 == 0 %}active{% endif %}" id="pills-{{ solution.solution_source }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ solution.solution_source }}"
                     type="button" role="tab" aria-controls="pills-{{ solution.solution_source }}" aria-selected="true">{{ solution.solution_source }}</button>
             </li>
         {% endfor %}
@@ -34,7 +39,7 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
         {% for solution in solutions %}
-            <div class="tab-pane fade show active" id="pills-{{ solution.solution_source }}" role="tabpanel" aria-labelledby="pills-{{ solution.solution_source }}-tab"
+            <div class="tab-pane fade show {% if forloop.counter0 == 0 %}active{% endif %}" id="pills-{{ solution.solution_source }}" role="tabpanel" aria-labelledby="pills-{{ solution.solution_source }}-tab"
                 tabindex="0">
             {{ solution.body|safe }}
             </div>

@@ -2,6 +2,22 @@ from typing import Iterable
 from django.db import models
 import re
 
+class Topic(models.Model):
+
+    name = models.CharField(max_length=500)
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
+
+    def get_level(self):
+        level = 0
+        topic = self
+        while topic.parent is not None:
+            topic = topic.parent
+            level += 1
+        return level
+
+    def __str__(self):
+        return ("--"*self.get_level()) + self.name
+
 class Source(models.Model):
     SOURCE_TYPES = {
         'PYQ': 'Previous Year',
@@ -42,6 +58,7 @@ class Question(models.Model):
 
     # Metadata
     sources = models.ManyToManyField(Source, null=True, blank=True)
+    topics = models.ManyToManyField(Topic, null=True, blank=True)
 
     # Auto-generated
     search_text = models.TextField(max_length=2000, null=True, blank=True)

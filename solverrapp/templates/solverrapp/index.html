@@ -30,6 +30,22 @@
     <meta name="theme-color" content="#712cf9">
 
     <style>
+        a:hover, a:visited, a:link, a:active {
+            text-decoration: none;
+            color: gainsboro;
+        }
+
+        .question {
+            background: #3f474f;
+        }
+        .question:hover {
+            background: #5d6975;
+        }
+
+        .question:hover a {
+            color: white;
+        }
+
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -151,7 +167,6 @@
         </header>
 
         <main class="px-3">
-            <!-- <h1>Search Engine for Solutions.</h1> -->
             <p class="lead" id="lead">Your comprehensive homework solution aggregator, scouring multiple sources for the perfect answer.</p>
             <div class="lead">
                 <input type="text" id="query" class="form-control" placeholder="Start typing your question..." oninput="search();" />
@@ -161,7 +176,7 @@
                 </div>
             </div>
         </main>
-         <div class="my-3" id="search-results" style="display: none;">
+         <div class="my-3 mx-3" id="search-results" style="display: none;">
                 <div class="card" >
   <ul class="list-group list-group-flush" id="result-list">
 
@@ -186,7 +201,6 @@
     const sym_translate = {
         'alpha':'α',
         'belong':'∈',
-        'in':'∈',
         'beta':'β',
         'infinity': '∞',
         'deg':'°',
@@ -204,17 +218,22 @@
         'sigma':'σ',
         'OMEGA':'Ω',
         'omega':'ω',
+        'int':'∫',
+        'sum':'∑',
+    }
+    const auto_translate = {
+        '<=':'≤',
+        '>=':'≥',
+        '!=':'≠'
     }
 
     function update_result(json) {
          var inner_HT = ""
          for (let i in json.payload.data) {
-             inner_HT += `<li class="list-group-item">${json.payload.data[i].text}</li>`
+             inner_HT += `<li class="list-group-item question"><a href="questions/${json.payload.data[i].index}/">${json.payload.data[i].text}</a></li>`
         }
-    result_list.innerHTML = inner_HT;
-
-         renderMathInElement(
-            result_list,
+        result_list.innerHTML = inner_HT;
+        renderMathInElement(result_list,
             {
                 delimiters: [
                     { left: "$", right: "$", display: false },
@@ -231,7 +250,6 @@
         if (query.value.includes('\\')) {
             sym_insert.style.display = "block";
 
-
         } else {
             sym_insert.style.display = "none";
         }
@@ -239,6 +257,10 @@
 
         for (i in sym_translate) {
             query.value = query.value.replace("\\"+i, sym_translate[i])
+        }
+
+        for (i in auto_translate) {
+            query.value = query.value.replace(i, auto_translate[i])
         }
 
         query = query.value.trim().replace(/ /g, '%20');
@@ -251,14 +273,9 @@
             result_div.style.display = 'Block';
         }
 
-    {#  API CALLS AND STUFF  #}
-        console.log(`api/search/question?q=${query}`)
-    fetch(`api/search/question?q=${query}`)
-    .then((response) => response.json())
-  .then((json) => update_result(json));
-
-
-
+        fetch(`api/search/question?q=${query}`)
+            .then((response) => response.json())
+            .then((json) => update_result(json));
     }
 </script>
 </body>

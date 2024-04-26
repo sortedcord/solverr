@@ -19,15 +19,11 @@ def questions(request):
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     options = eval(question.question_options)
-    try:
-        solutions = Solution.objects.get(question=question)
-    except:
-        solutions = []
-    if not isinstance(solutions, list):
-        solutions = [solutions]
+    solutions = Solution.objects.filter(question=question)
+
 
     _solutions = []
-
+    print(len(solutions))
     for solution in solutions:
         if solution.solution_type == 'VID' and solution.solution_media_url.startswith('https://vimeo.com'):
             video_id = solution.solution_media_url.split("/")[-1].split('?')[0]
@@ -37,10 +33,13 @@ def question_detail(request, question_id):
             """
         elif solution.solution_type == 'IMG':
             body = f"<img src='{ solution.solution_media_url }'>"
+        else:
+            body = solution.solution_body
         _solutions.append({
             'body': body,
             'solution_source':solution.solution_source
         })
+
 
     return render(request, "solverrapp/questions/question_detail.html", context={'question':question, 'options':options, 'solutions':_solutions})
 
@@ -66,27 +65,35 @@ def question_solve(request, question_id):
 def api_question_search(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Only GET requests are allowed'}, status=405)
-    query = request.GET.get('q').replace("%20", " ").lower()
+    query = re.sub('%20','', request.GET.get('q').lower())
     _questions = []
     q_objs = Question.objects.all()
-    contains = False
+
+    s_query = re.sub(r'[ ,_^:{}()\[\]/]', '', query)
+
+
     for question in q_objs:
-        # Check with search_text
-        if question.search_text is not None:
-            #     sanitize query
-            s_query = re.sub(r'[ ,_^:{}()\[\]/]', '', query)
-            if s_query in question.search_text:
-                contains = True
-        if query in question.display_text:
+        contains = False
+        if (question.search_text is not None) and (s_query in question.search_text):
             contains = True
-        if contains:
-            _questions.append({
-                'text': question.display_text,
-                'image': question.display_image,
-            })
+
+        if (query in question.display_text):
+            contains = True
+
+        if not contains:
+            continue
+
+        _questions.append({
+            'text': question.display_text,
+            'image': question.display_image,
+            'index': question.id,
+        })
+
+    if len(_questions) > 4:
+        _questions = _questions[:4]
 
     return JsonResponse({
-        'payload':{'data':_questions[:4]}
+        'payload':{'data':_questions}
     })
 
 
