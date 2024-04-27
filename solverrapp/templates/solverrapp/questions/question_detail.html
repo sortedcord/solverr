@@ -41,7 +41,7 @@
         {% for solution in solutions %}
             <div class="tab-pane fade show {% if forloop.counter0 == 0 %}active{% endif %}" id="pills-{{ solution.solution_source }}" role="tabpanel" aria-labelledby="pills-{{ solution.solution_source }}-tab"
                 tabindex="0">
-            {{ solution.body|safe }}
+            {{ solution.solution_body|safe }}
             </div>
         {% endfor %}
             <!-- About the question -->

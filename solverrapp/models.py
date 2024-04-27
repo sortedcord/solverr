@@ -95,8 +95,33 @@ class Solution(models.Model):
     }
 
     solution_type = models.CharField(max_length=100, choices=SOLUTION_TYPES)
-    solution_media_url = models.URLField(blank=True, null=True)
     solution_source = models.CharField(max_length=100, blank=True, null=True)
 
     solution_body = models.TextField(max_length=3000, blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    answer = models.CharField(max_length=3000, blank=True, null=True)
+
+    def generate_body(self):
+        if not self.solution_body.startswith("$PROCESS"):
+            return
+        self.solution_body.replace("$PROCESS", '')
+
+        if self.solution_type == 'IMG':
+            self.solution_body = f"<img class='img-fluid' src='{self.solution_body}'>"
+        elif self.solution_type == 'VID':
+            if self.solution_body.endswith('.mp4') or self.solution_body.endswith('.webm') or self.solution_body.endswith('.mkv'):
+                self.solution_body = f"<video class='img-fluid'><source src='{self.solution_body}'></video>"
+            elif 'vimeo.com' in self.solution_body:
+                video_id = self.solution_body.split("/")[-1].split('?')[0]
+                self.solution_body = f"""
+<div style="padding:56.25% 0 0 0;position:relative;">
+<iframe src="https://player.vimeo.com/video/{video_id}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:0.6rem;"></iframe>
+</div>
+<script src="https://player.vimeo.com/api/player.js"></script>
+                    """
+
+    def save(self):
+        self.generate_body()
+        return super().save()
+
