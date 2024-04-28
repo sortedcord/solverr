@@ -16,6 +16,7 @@ def questions(request):
     questions = Question.objects.all()
     return render(request, "solverrapp/questions/questions.html", context={'questions':questions})
 
+
 def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     options = eval(question.question_options)
@@ -90,6 +91,7 @@ def api_sources_list(request):
         })
 
     return JsonResponse({'data':sources_dict}, status=200)
+
 
 @csrf_exempt
 def api_new_source(request):
@@ -181,6 +183,10 @@ def api_question_submit(request):
             question_type=post_data_dict['type'],
             question_options=str(post_data_dict['options']),
         )
+
+        if qmodobj.question_type not in ('MCQ', 'SCQ'):
+            qmodobj.question_options = post_data_dict['answer']
+
         qmodobj.save()
         sources = post_data_dict['sources']
         for source_str in sources:
