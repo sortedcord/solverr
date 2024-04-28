@@ -8,7 +8,7 @@
         <select class="form-select mb-1" id="question-type-select" aria-label="Question Type Select"
             onchange="update_question_type()">
             {% for key, value in question_types %}
-            <option value="{{key}}">{{ value }}</option>
+                <option value="{{key}}">{{ value }}</option>
             {% endfor %}
         </select>
         <small class="text-secondary">
@@ -69,20 +69,21 @@
         <div class="mb-3" id="metadata-section">
             <h5>Metadata</h5>
             <label class="form-label">Sources</label>
-            <input class="form-control mb-3" placeholder="Search Sources" type="text">
+            <div class="mb-3">
+                <input class="form-control" placeholder="Search Sources" type="text" id="source-search" oninput="searchSource()">
+                <button style="display: none" id="new-source-btn" type="button" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                  Add a New Source
+                </button>
+            </div>
             <select id="source-select" class="form-select mb-1" size="5" aria-label="source select" multiple>
-                {%for source in sources%}
-                <option class="source-option" value="{{source.name}}">{{source.name}}</option>
-                {% endfor %}
             </select>
             <small class="text-secondary">
                 Multiple sources can be selected at once. Hold down control for windows or command for mac and click on
-                the
-                sources you want to select
+                the sources you want to select
             </small>
         </div>
 
-        <button type="button" onclick="SubmitQuestion()" class="btn btn-primary">Submit</button>
+        <button type="button" onclick="SubmitQuestion()" class="btn btn-primary" >Submit</button>
 </form>
 
 <!-- TOAST -->
@@ -102,6 +103,40 @@
     </div>
 </div>
 <!--  -->
+
+  <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">New Source</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-source">
+            <div class="form-floating mb-3">
+  <input class="form-control" id="source-name" placeholder="name@example.com">
+  <label for="source-name">Source Name</label>
+            </div><div class="form-floating mb-3">
+                <select class="form-select" id="source-type">
+            {% for key, value in source_types.items %}
+                <option value="{{ key }}">{{ value }}</option>
+            {% endfor %}
+        </select>
+            <label for="source-type">Source Type</label>
+</div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="addSource();">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -219,6 +254,90 @@
 
     }
 
+    function refreshSources(sources) {
+        var sources_select = document.getElementById('source-select');
+        sources_select.innerHTML = "";
+        sources.data.forEach(source => {
+            option_el = `<option class="source-option" value="${source.name}">${source.name}</option>`
+            sources_select.innerHTML = sources_select.innerHTML + option_el;
+        })
+    }
+
+    function getSources(){
+        fetch('/api/sources')
+            .then(response => response.json())
+            .then(data => refreshSources(data));
+    }
+
+    function searchSource(){
+        var query = document.getElementById('source-search').value;
+
+        document.getElementById('source-name').value = query;
+
+        sources = document.querySelectorAll('.source-option');
+        sources.forEach(option => {
+            if (option.value.toLowerCase().includes(query.toLowerCase())) {
+                option.style.display = '';
+
+            } else {
+                option.style.display = 'none';
+            }
+        });
+
+
+        var none = true;
+        sources.forEach(option => {
+            if (option.style.display === '') {
+                none = false;
+            }
+        });
+
+        if (none) {
+            // New source display
+            document.getElementById('new-source-btn').style.display = '';
+
+        } else {
+            document.getElementById('new-source-btn').style.display = 'none';
+        }
+    }
+
+    function addSource() {
+        const source_name = document.getElementById('source-name').value;
+        const source_type = document.getElementById('source-type').value;
+
+        data = {
+            name: source_name,
+            type: source_type,
+        }
+
+        fetch('/api/new/source', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the JSON response
+            })
+            .then(data => {
+                console.log('POST request succeeded with JSON response', data);
+                getSources();
+                document.getElementById('source-name').value = ""
+                document.getElementById('source-type').value = ""
+                document.getElementById('source-search').value = ""
+
+            })
+            .catch(error => {
+                console.error('There was a problem with the POST request:', error);
+            });
+
+
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         // Ensure there are at least two options on load
         if (optionsContainer.querySelectorAll('.option-item').length < 2) {
@@ -242,6 +361,7 @@
         });
 
         update_question_type();
+        getSources();
 
     });
 </script>

@@ -79,6 +79,13 @@ class Question(models.Model):
         main_string_without_images = re.sub(pattern, '', self.display_body)
         self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip()
 
+    def is_solved(self) -> bool:
+        if Solution.objects.filter(question=self):
+            return True
+        else:
+            return False
+
+
     def __str__(self) -> str:
         return self.question_body[:50]+' ...'
     

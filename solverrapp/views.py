@@ -26,7 +26,9 @@ def question_detail(request, question_id):
 def question_new(request):
     question_types = Question.QUESTION_TYPES.items()
     sources = Source.objects.all()
-    return render(request, "solverrapp/questions/question_new.html", context={'question_types':question_types, 'sources':sources})
+    source_types = Source.SOURCE_TYPES
+    return render(request, "solverrapp/questions/question_new.html", context={'question_types':question_types, 'sources':sources,
+                                                                              'source_types':source_types})
 
 def question_solve(request, question_id):
     solution_types = Solution.SOLUTION_TYPES.items()
@@ -77,6 +79,45 @@ def api_question_search(request):
     })
 
 
+def api_sources_list(request):
+    sources = Source.objects.all()
+
+    sources_dict = []
+    for source in sources:
+        sources_dict.append({
+            'name': source.name,
+            'type': source.source_type
+        })
+
+    return JsonResponse({'data':sources_dict}, status=200)
+
+@csrf_exempt
+def api_new_source(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+    content_type = request.headers.get('Content-Type', '')
+    if 'application/json' in content_type:
+        try:
+            # Parse JSON data
+            post_data_dict = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    elif 'multipart/form-data' in content_type:
+        # Parse form data
+        post_data_dict = request.POST.dict()
+
+    else:
+        return JsonResponse({'error': 'Unsupported Content-Type'}, status=415)
+
+    source_dict = post_data_dict
+
+    new_source = Source(name=source_dict['name'], source_type=source_dict['type'])
+    new_source.save()
+
+    return JsonResponse({'payload': post_data_dict})
+
+
 @csrf_exempt
 def api_solution_submit(request):
     if request.method != 'POST':
@@ -96,7 +137,6 @@ def api_solution_submit(request):
     else:
         return JsonResponse({'error': 'Unsupported Content-Type'}, status=415)
 
-    print(post_data_dict)
     question = Question.objects.get(id=post_data_dict['question_id'])
 
     if -1 in post_data_dict['sel_answers']:
