@@ -1,3 +1,22 @@
+function inLatex(stringSequence, delimiter = '$') {
+    let current = false;
+    let block = false;
+    let i = 0;
+    while (i < stringSequence.length ) {
+        if (stringSequence[i] === delimiter) {
+            current = !current;
+            // If the next char is also delimiter then set it to block equation and skip the next char
+            if (stringSequence[i + 1] === delimiter) {
+                block = !block;
+                i += 1;
+            }
+        }
+        i += 1;
+    }
+    return current;
+}
+
+
 const toolbar_buttons = {
     'image': [
         {
@@ -94,7 +113,7 @@ function getButton(name) {
     for (const group in toolbar_buttons) {
         if (Object.hasOwnProperty.call(toolbar_buttons, group)) {
             toolbar_buttons[group].forEach(button => {
-                if (button.name == name) {
+                if (button.name === name) {
                     req_button = button;
                     req_group = group;
                 }
@@ -104,31 +123,14 @@ function getButton(name) {
     return [req_button, req_group];
 }
 
-function isInsideEquation(text, cursorPosition) {
-    const stack = []; // Stack to keep track of opening characters ('$' or '$$')
-
-    for (let i = 0; i < cursorPosition; i++) {
-        if (text[i] === '$') {
-            if (i > 0 && text[i - 1] === '$') {
-                if (stack.length > 0 && stack[stack.length - 1] === '$$') {
-                    stack.pop();
-                } else {
-                    stack.push('$$');
-                }
-            } else {
-                stack.push('$');
-            }
-        }
-    }
-    return stack.length > 0;
-}
-
 function toolbarInsert(name) {
     const [button, group] = getButton(name);
 
     var textarea = document.querySelector('.rtxt-textarea');
     
-    const equation_mode = isInsideEquation(textarea.value, textarea.selectionStart);
+    const equation_mode = inLatex(textarea.value.slice(0,textarea.selectionStart));
+
+    // console.log(`IN EQUATION: ${equation_mode} CURSOR POSITION ${textarea.selectionStart}`)
 
     if (button.cursor === 'end') {
         start_pos = end_pos = button.code.length;

@@ -21,6 +21,7 @@ def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     options = eval(question.question_options)
     solutions = Solution.objects.filter(question=question)
+    question.generate_search_text()
 
     return render(request, "solverrapp/questions/question_detail.html", context={'question':question, 'options':options, 'solutions':solutions})
 

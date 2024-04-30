@@ -55,7 +55,6 @@ class Question(models.Model):
     --- is_correct
     """
 
-
     # Metadata
     sources = models.ManyToManyField(Source, null=True, blank=True)
     topics = models.ManyToManyField(Topic, null=True, blank=True)
@@ -78,6 +77,39 @@ class Question(models.Model):
 
         main_string_without_images = re.sub(pattern, '', self.display_body)
         self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip()
+
+    def generate_search_text(self) -> str:
+        to_null = r"""[ ,.`_'$^":{}()\[\]/]"""
+        sym_replace = {
+            'alpha':'α',
+            'belong':'∈',
+            'beta':'β',
+            'infinity': '∞',
+            'deg':'°',
+            '!=':'≠',
+            'greaterthanequal':'≥',
+            'lessthanequal':'≤',
+            'gamma':'γ',
+            'delta':'Δ',
+            'epsilon':'ε',
+            'theta':'θ',
+            'lambda':'λ',
+            'mu':'μ',
+            'pi':'π',
+            'SIGMA':'Σ',
+            'sigma':'σ',
+            'OMEGA':'Ω',
+            'omega':'ω',
+            'int':'∫',
+            'sum':'∑',
+        }
+        sanitized = re.sub(to_null, '', self.display_text.lower())
+        self.search_text = sanitized
+
+        for key, value in sym_replace.items():
+            self.search_text.replace('\\'+key, value)
+        print(self.search_text)
+        return self.search_text
 
     def is_solved(self) -> bool:
         if Solution.objects.filter(question=self):
