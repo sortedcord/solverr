@@ -1,6 +1,7 @@
 from typing import Iterable
 from django.db import models
 import re
+from .utils import sanitize_question
 
 class Topic(models.Model):
 
@@ -78,51 +79,18 @@ class Question(models.Model):
         main_string_without_images = re.sub(pattern, '', self.display_body)
         self.display_text = main_string_without_images.strip().replace("<br>","").replace("–", "").strip()
 
-    def generate_search_text(self) -> str:
-        to_null = r"""[ ,.`_'$^":{}()\[\]/]"""
-        sym_replace = {
-            'alpha':'α',
-            'belong':'∈',
-            'beta':'β',
-            'infinity': '∞',
-            'deg':'°',
-            '!=':'≠',
-            'greaterthanequal':'≥',
-            'lessthanequal':'≤',
-            'gamma':'γ',
-            'delta':'Δ',
-            'epsilon':'ε',
-            'theta':'θ',
-            'lambda':'λ',
-            'mu':'μ',
-            'pi':'π',
-            'SIGMA':'Σ',
-            'sigma':'σ',
-            'OMEGA':'Ω',
-            'omega':'ω',
-            'int':'∫',
-            'sum':'∑',
-        }
-        sanitized = re.sub(to_null, '', self.display_text.lower())
-        self.search_text = sanitized
-
-        for key, value in sym_replace.items():
-            self.search_text.replace('\\'+key, value)
-        print(self.search_text)
-        return self.search_text
-
     def is_solved(self) -> bool:
         if Solution.objects.filter(question=self):
             return True
         else:
             return False
 
-
     def __str__(self) -> str:
         return self.question_body[:50]+' ...'
     
     def save(self) -> None:
         self.render_body()
+        self.search_text = sanitize_question(self.display_text)
         return super().save()
 
 

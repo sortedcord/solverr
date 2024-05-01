@@ -8,6 +8,10 @@ from django.http import JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
+from .utils import sanitize_question
+
+from .scrape import search_connectors
+
 
 def index(request):
     return render(request, "solverrapp/index.html")
@@ -21,7 +25,7 @@ def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     options = eval(question.question_options)
     solutions = Solution.objects.filter(question=question)
-    question.generate_search_text()
+    print(sanitize_question(question.display_text))
 
     return render(request, "solverrapp/questions/question_detail.html", context={'question':question, 'options':options, 'solutions':solutions})
 
@@ -73,6 +77,7 @@ def api_question_search(request):
             'index': question.id,
         })
 
+    # search_connectors(query)
     if len(_questions) > 4:
         _questions = _questions[:4]
 

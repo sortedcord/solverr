@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en" class="h-100" data-bs-theme="auto">
 
@@ -130,30 +131,6 @@
 </head>
 
 <body class="d-flex h-100 text-center text-bg-dark">
-    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-        <symbol id="check2" viewBox="0 0 16 16">
-            <path
-                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"
-                https://getbootstrap.com />
-        </symbol>
-        <symbol id="circle-half" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z" https://getbootstrap.com />
-        </symbol>
-        <symbol id="moon-stars-fill" viewBox="0 0 16 16">
-            <path
-                d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"
-                https://getbootstrap.com />
-            <path
-                d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"
-                https://getbootstrap.com />
-        </symbol>
-        <symbol id="sun-fill" viewBox="0 0 16 16">
-            <path
-                d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"
-                https://getbootstrap.com />
-        </symbol>
-    </svg>
-
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <header class="mb-auto">
             <div>
@@ -169,7 +146,7 @@
         <main class="px-3">
             <p class="lead" id="lead">Your comprehensive homework solution aggregator, scouring multiple sources for the perfect answer.</p>
             <div class="lead">
-                <input type="text" id="query" class="form-control" placeholder="Start typing your question..." oninput="search();" />
+                <input type="text" id="query" class="form-control" placeholder="Start typing your question..." />
                 <div style="display: none;" class="bg-secondary border rounded-2 mt-1" id="symbol-insert">
                     <span style="font-family: monospace;" class="fs-6">Inserting Symbol</span>
                     <span style="font-family: monospace;" class="fs-6" id="sym"></span>
@@ -194,90 +171,7 @@
     <script src="https://getbootstrap.com/docs/5.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-<script>
-    var result_list = document.getElementById('result-list');
-    var result_div = document.getElementById('search-results');
-
-    const sym_translate = {
-        'alpha':'α',
-        'belong':'∈',
-        'beta':'β',
-        'infinity': '∞',
-        'deg':'°',
-        'notequal':'≠',
-        'greaterthanequal':'≥',
-        'lessthanequal':'≤',
-        'gamma':'γ',
-        'delta':'Δ',
-        'epsilon':'ε',
-        'theta':'θ',
-        'lambda':'λ',
-        'mu':'μ',
-        'pi':'π',
-        'SIGMA':'Σ',
-        'sigma':'σ',
-        'OMEGA':'Ω',
-        'omega':'ω',
-        'int':'∫',
-        'sum':'∑',
-    }
-    const auto_translate = {
-        '<=':'≤',
-        '>=':'≥',
-        '!=':'≠'
-    }
-
-    function update_result(json) {
-         var inner_HT = ""
-         for (let i in json.payload.data) {
-             inner_HT += `<li class="list-group-item question"><a href="questions/${json.payload.data[i].index}/">${json.payload.data[i].text}</a></li>`
-        }
-        result_list.innerHTML = inner_HT;
-        renderMathInElement(result_list,
-            {
-                delimiters: [
-                    { left: "$", right: "$", display: false },
-                    { left: "$$", right: "$$", display: true },
-                ]
-            }
-        );
-    }
-
-    function search() {
-        var query = document.getElementById('query');
-
-        var sym_insert = document.getElementById("symbol-insert");
-        if (query.value.includes('\\')) {
-            sym_insert.style.display = "block";
-
-        } else {
-            sym_insert.style.display = "none";
-        }
-
-
-        for (i in sym_translate) {
-            query.value = query.value.replace("\\"+i, sym_translate[i])
-        }
-
-        for (i in auto_translate) {
-            query.value = query.value.replace(i, auto_translate[i])
-        }
-
-        query = query.value.trim().replace(/ /g, '%20');
-        if (query === '') {
-            result_list.innerHTML="";
-            result_div.style.display = "none";
-            return;
-        }
-        else {
-            result_div.style.display = 'Block';
-        }
-
-        fetch(`api/search/question?q=${query}`)
-            .then((response) => response.json())
-            .then((json) => update_result(json));
-    }
-</script>
+<script src="{% static 'solverrapp/js/instantSearch.js' %}"></script>
 </body>
 
 </html>
